@@ -1,0 +1,81 @@
+application:
+  swagger:
+    title: INJOB API DESCRIPTION
+    description: "Injob  Api"
+    url: http://localhost:8082/back/api
+  keycloak-base-url: ${KEYCLOAK_BASE_URL}
+  realm: ${REALM}
+spring:
+  ai:
+    openai:
+      api-key: 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
+      base-url: https://openrouter.ai/api
+      chat:
+        options:
+          model: openrouter/cypher-alpha:free
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10000MB
+      max-request-size: 10000MB
+  main:
+    allow-circular-references: true
+  application:
+    name: InJobBack
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_BASE_URL:http://localhost:8080}/realms/${REALM:in_job}
+  datasource:
+    username: root
+    url: jdbc:postgresql://localhost:5433/injobdb
+    password: azerty
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  auth:
+    converter:
+      resource-id: spring_client
+      principal-attribute: preferred_username
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        web: ERROR
+        security: DEBUG
+      hibernate: ERROR
+
+server:
+  port: ${SERVER_PORT:8082}
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10GB # Adjust the file size limit as needed
+      max-request-size: 10GB
+    context-path: /back/api
+springdoc:
+  api-docs:
+    groups:
+      enabled: true
+    enabled: true # Disabling the /api-docs enpoint
+  show-actuator: true
+  swagger-ui:
+    enabled: true # Disabling the /swagger-api enpoint
+    defaultModelsExpandDepth: -1
+    operationsSorter: method
+    oauth:
+      clientId: spring_client
+      clientSecret:
+      grant-type: client_credentials
+    disable-swagger-default-url: true
+  oAuthFlow:
+    tokenUrl: ${KEYCLOAK_AUTH_URL:http://localhost:8080/realms/in_job}/protocol/openid-connect/token
+    use-pkce-with-authorization-code-grant: true
